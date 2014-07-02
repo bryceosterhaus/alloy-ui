@@ -570,7 +570,7 @@ var ColorPicker = A.Component.create(
 						}
 					).render(instance.get('contentBox'));
 
-					var bodyNode = container._stdModNode;
+					var bodyNode = container.get('contentBox');
 
 					bodyNode.addClass(CSS_CONTAINER);
 
