@@ -7,8 +7,11 @@
 
 var L = A.Lang,
 
+    AEscape = A.Escape,
+
     getCN = A.getClassName,
 
+    CSS_RADIO = getCN('radio'),
     CSS_FIELD = getCN('field'),
     CSS_FIELD_CHOICE = getCN('field', 'choice'),
     CSS_FIELD_RADIO = getCN('field', 'radio'),
@@ -18,9 +21,9 @@ var L = A.Lang,
 
     TPL_OPTIONS_CONTAINER = '<div class="' + CSS_FORM_BUILDER_FIELD_OPTIONS_CONTAINER + '"></div>',
     TPL_RADIO =
-        '<div><input id="{id}" class="' + [CSS_FIELD, CSS_FIELD_CHOICE, CSS_FIELD_RADIO, CSS_FORM_BUILDER_FIELD_NODE].join(
-            ' ') +
-        '" name="{name}" type="radio" value="{value}" {checked} {disabled} /><label class="field-label" for="{id}">{label}</label></div>';
+        '<div class="' + CSS_RADIO + '"><label class="field-label" for="{id}"><input id="{id}" class="' +
+        [CSS_FIELD, CSS_FIELD_CHOICE, CSS_FIELD_RADIO, CSS_FORM_BUILDER_FIELD_NODE].join(' ') +
+        '" name="{name}" type="radio" value="{value}" {checked} {disabled} />{label}</label></div>';
 
 /**
  * A base class for `A.FormBuilderRadioField`.
@@ -34,15 +37,6 @@ var L = A.Lang,
 var FormBuilderRadioField = A.Component.create({
 
     /**
-     * Static property provides a string to identify the class.
-     *
-     * @property NAME
-     * @type String
-     * @static
-     */
-    NAME: 'form-builder-radio-field',
-
-    /**
      * Static property used to define the default attribute
      * configuration for the `A.FormBuilderRadioField`.
      *
@@ -51,15 +45,6 @@ var FormBuilderRadioField = A.Component.create({
      * @static
      */
     ATTRS: {
-
-        /**
-         * Specifies a predefined value for the radio field.
-         *
-         * @attribute predefinedValue
-         */
-        predefinedValue: {
-            valueFn: '_valuePredefinedValueFn'
-        },
 
         /**
          * Reusable block of markup used to generate the field.
@@ -91,6 +76,15 @@ var FormBuilderRadioField = A.Component.create({
      * @static
      */
     EXTENDS: A.FormBuilderMultipleChoiceField,
+
+    /**
+     * Static property provides a string to identify the class.
+     *
+     * @property NAME
+     * @type String
+     * @static
+     */
+    NAME: 'form-builder-radio-field',
 
     prototype: {
 
@@ -136,7 +130,6 @@ var FormBuilderRadioField = A.Component.create({
             var instance = this,
                 buffer = [],
                 counter = 0,
-                hasPredefinedValue = false,
                 predefinedValue = instance.get('predefinedValue'),
                 templateNode = instance.get('templateNode');
 
@@ -148,28 +141,20 @@ var FormBuilderRadioField = A.Component.create({
                         TPL_RADIO, {
                             checked: checked ? 'checked="checked"' : '',
                             disabled: instance.get('disabled') ? 'disabled="disabled"' : '',
-                            id: A.Escape.html(instance.get('id') + counter++),
-                            label: A.Escape.html(item.label),
-                            name: A.Escape.html(instance.get('name')),
-                            value: A.Escape.html(item.value)
+                            id: AEscape.html(instance.get('id') + counter++),
+                            label: AEscape.html(item.label),
+                            name: AEscape.html(instance.get('name')),
+                            value: AEscape.html(item.value)
                         }
                     )
                 );
-
-                if (checked) {
-                    hasPredefinedValue = true;
-                }
             });
 
             instance.optionNodes = A.NodeList.create(buffer.join(''));
 
             templateNode.setContent(instance.optionNodes);
 
-            if (!hasPredefinedValue) {
-                instance.set('predefinedValue', instance._valuePredefinedValueFn());
-
-                instance.get('builder').editField(instance);
-            }
+            instance.get('builder').editField(instance);
         },
 
         /**
@@ -189,31 +174,12 @@ var FormBuilderRadioField = A.Component.create({
 
             optionNodes.set('checked', false);
 
-            optionNodes.all('input[value="' + A.Escape.html(val) + '"]').set('checked', true);
-        },
-
-        /**
-         * Returns the first option value if no predefined value is specified.
-         *
-         * @method _valuePredefinedValueFn
-         * @protected
-         */
-        _valuePredefinedValueFn: function() {
-            var instance = this,
-                options = instance.get('options'),
-                predefinedValue;
-
-            if (options.length) {
-                predefinedValue = options[0].value;
-            }
-
-            return predefinedValue;
+            optionNodes.all('input[value="' + AEscape.html(val) + '"]').set('checked', true);
         }
-
     }
 
 });
 
 A.FormBuilderRadioField = FormBuilderRadioField;
 
-A.FormBuilder.types.radio = A.FormBuilderRadioField;
+A.FormBuilderField.types.radio = A.FormBuilderRadioField;

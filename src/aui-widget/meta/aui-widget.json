@@ -29,7 +29,8 @@
         "requires": [
             "classnamemanager",
             "scrollview-base",
-            "scrollview-paginator"
+            "scrollview-paginator",
+            "timers"
         ]
     },
 
@@ -47,6 +48,12 @@
         "requires": [
             "widget-position-align",
             "widget-stdmod"
+        ]
+    },
+
+    "aui-widget-shortcut": {
+        "requires": [
+            "base"
         ]
     },
 

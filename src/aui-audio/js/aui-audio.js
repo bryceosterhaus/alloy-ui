@@ -52,15 +52,27 @@ var AudioImpl = A.Component.create({
     ATTRS: {
 
         /**
-         * URL used by Audio to play.
+         * Variables used by Flash player.
          *
-         * @attribute url
-         * @default ''
-         * @type String
+         * @attribute flashVars
+         * @default {}
+         * @type Object
          */
-        url: {
-            value: '',
-            validator: Lang.isString
+        flashVars: {
+            value: {},
+            validator: Lang.isObject
+        },
+
+        /**
+         * An additional list of attributes.
+         *
+         * @attribute fixedAttributes
+         * @default {}
+         * @type Object
+         */
+        fixedAttributes: {
+            value: {},
+            validator: Lang.isObject
         },
 
         /**
@@ -76,14 +88,26 @@ var AudioImpl = A.Component.create({
         },
 
         /**
-         * The type of audio.
+         * If `true` the render phase will be automatically invoked
+         * preventing the `.render()` manual call.
          *
-         * @attribute type
-         * @default mp3
+         * @attribute render
+         * @default true
+         * @type Boolean
+         */
+        render: {
+            value: true,
+            validator: Lang.isBoolean
+        },
+
+        /**
+         * Sets the `aria-role` for Audio.
+         *
+         * @attribute role
          * @type String
          */
-        type: {
-            value: 'mp3',
+        role: {
+            value: 'application',
             validator: Lang.isString
         },
 
@@ -125,40 +149,41 @@ var AudioImpl = A.Component.create({
         },
 
         /**
-         * An additional list of attributes.
+         * The type of audio.
          *
-         * @attribute fixedAttributes
-         * @default {}
-         * @type Object
+         * @attribute type
+         * @default mp3
+         * @type String
          */
-        fixedAttributes: {
-            value: {},
-            validator: Lang.isObject
+        type: {
+            value: 'mp3',
+            validator: Lang.isString
         },
 
         /**
-         * Variables used by Flash player.
+         * URL used by Audio to play.
          *
-         * @attribute flashVars
-         * @default {}
-         * @type Object
+         * @attribute url
+         * @default ''
+         * @type String
          */
-        flashVars: {
-            value: {},
-            validator: Lang.isObject
+        url: {
+            value: '',
+            validator: Lang.isString
         },
 
         /**
-         * If `true` the render phase will be automatically invoked
-         * preventing the `.render()` manual call.
+         * Boolean indicating if use of the WAI-ARIA Roles and States
+         * should be enabled.
          *
-         * @attribute render
+         * @attribute useARIA
          * @default true
          * @type Boolean
          */
-        render: {
+        useARIA: {
             value: true,
-            validator: Lang.isBoolean
+            validator: Lang.isBoolean,
+            writeOnce: 'initOnly'
         }
     },
 
@@ -208,11 +233,34 @@ var AudioImpl = A.Component.create({
         bindUI: function() {
             var instance = this;
 
-            instance.publish(
-                'audioReady', {
+            instance.publish({
+                audioReady: {
                     fireOnce: true
-                }
-            );
+                },
+                pause: {},
+                play: {}
+            });
+
+            instance._audio.on({
+                pause: instance._onPause,
+                play: instance._onPlay
+            });
+        },
+
+        /**
+         * Sync the Audio UI. Lifecycle.
+         *
+         * @method syncUI
+         * @protected
+         */
+        syncUI: function() {
+            var instance = this;
+
+            if (instance.get('useARIA')) {
+                instance.plug(A.Plugin.Aria, {
+                    roleName: instance.get('role')
+                });
+            }
         },
 
         /**
@@ -252,6 +300,32 @@ var AudioImpl = A.Component.create({
             if (instance._audio.hasMethod('play')) {
                 instance._audio.invoke('play');
             }
+        },
+
+        /**
+         * Fires on video pause event fires.
+         *
+         * @method _onPause
+         * @param {EventFacade} event
+         * @protected
+         */
+        _onPause: function (event) {
+            this.fire('play', {
+                cropType: event.type
+            });
+        },
+
+        /**
+         * Fires on video play event fires.
+         *
+         * @method _onPlay
+         * @param {EventFacade} event
+         * @protected
+         */
+        _onPlay: function (event) {
+            this.fire('pause', {
+                cropType: event.type
+            });
         },
 
         /**
@@ -491,7 +565,7 @@ var AudioImpl = A.Component.create({
             var sourceMp3 = instance._sourceMp3;
 
             if (UA.gecko && !instance._usingAudio()) {
-                if (sourceMp3 !== null) {
+                if (sourceMp3) {
                     sourceMp3.remove(true);
 
                     instance._sourceMp3 = null;

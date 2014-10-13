@@ -70,7 +70,7 @@ A.Tab = A.Component.create({
     ATTRS: {
 
         /**
-         * TODO. Wanna help? Please send a Pull Request.
+         * Defines if the tabs should be enable or not.
          *
          * @attribute disabled
          * @type Boolean
@@ -116,7 +116,7 @@ A.Tab = A.Component.create({
         },
 
         /**
-         * Fire after `disabled` class been set on the UI.
+         * Fire after `disabled` attribute been set on the UI.
          *
          * @method _afterUiSetDisabled
          * @param val
@@ -163,7 +163,7 @@ A.Tab = A.Component.create({
         },
 
         /**
-         * Determines the value of the disabled attribute
+         * Determines the value of the `disabled` attribute.
          *
          * @method _valueDisabled
          * @protected
@@ -275,6 +275,15 @@ A.TabView = A.Component.create({
      * @static
      */
     EXTENDS: A.TabView,
+
+    /**
+     * Static property used to define the augmented classes.
+     *
+     * @property AUGMENTS
+     * @type Array
+     * @static
+     */
+    AUGMENTS: [A.WidgetCssClass],
 
     prototype: {
 

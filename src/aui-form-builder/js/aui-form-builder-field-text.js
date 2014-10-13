@@ -7,6 +7,8 @@
 
 var L = A.Lang,
 
+    AEscape = A.Escape,
+
     getCN = A.getClassName,
 
     CSS_FORM_CONTROL = getCN('form', 'control'),
@@ -73,6 +75,10 @@ var FormBuilderTextField = A.Component.create({
          * @default 'small'
          */
         width: {
+            validator: function(val) {
+                val = A.Lang.String.toLowerCase(val);
+                return val in WIDTH_VALUES_MAP;
+            },
             value: 'small'
         }
 
@@ -109,11 +115,11 @@ var FormBuilderTextField = A.Component.create({
 
             return L.sub(
                 instance.get('template'), {
-                    id: A.Escape.html(instance.get('id')),
-                    label: A.Escape.html(instance.get('label')),
-                    name: A.Escape.html(instance.get('name')),
-                    value: A.Escape.html(instance.get('predefinedValue')),
-                    width: A.Escape.html(instance.get('width'))
+                    id: AEscape.html(instance.get('id')),
+                    label: AEscape.html(instance.get('label')),
+                    name: AEscape.html(instance.get('name')),
+                    value: AEscape.html(instance.get('predefinedValue')),
+                    width: AEscape.html(instance.get('width'))
                 }
             );
         },
@@ -171,4 +177,4 @@ var FormBuilderTextField = A.Component.create({
 
 A.FormBuilderTextField = FormBuilderTextField;
 
-A.FormBuilder.types.text = A.FormBuilderTextField;
+A.FormBuilderField.types.text = A.FormBuilderTextField;

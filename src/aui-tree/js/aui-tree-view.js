@@ -11,6 +11,14 @@ var L = A.Lang,
 
     UA = A.UA,
 
+    addClassTreeNode = function(rootNode) {
+        rootNode.addClass(CSS_TREE_NODE);
+
+        rootNode.all('> ul > li').each(function(node) {
+            addClassTreeNode(node);
+        });
+    },
+
     concat = function() {
         return Array.prototype.slice.call(arguments).join(' ');
     },
@@ -24,6 +32,7 @@ var L = A.Lang,
     CSS_TREE_HITAREA = getCN('tree', 'hitarea'),
     CSS_TREE_ICON = getCN('tree', 'icon'),
     CSS_TREE_LABEL = getCN('tree', 'label'),
+    CSS_TREE_NODE = getCN('tree', 'node'),
     CSS_TREE_NODE_CONTENT = getCN('tree', 'node', 'content'),
     CSS_TREE_NODE_CONTENT_INVALID = getCN('tree', 'node', 'content', 'invalid'),
     CSS_TREE_ROOT_CONTAINER = getCN('tree', 'root', 'container'),
@@ -116,6 +125,22 @@ var TreeView = A.Component.create({
 
     AUGMENTS: [A.TreeData, A.TreeViewPaginator, A.TreeViewIO],
 
+    /**
+     * @property HTML_PARSER
+     * @type {Object}
+     * @protected
+     * @static
+     */
+    HTML_PARSER: {
+        contentBox: function(contentBox) {
+            var root = contentBox.all('> li');
+
+            addClassTreeNode(root);
+
+            return contentBox;
+        }
+    },
+
     prototype: {
         CONTENT_TEMPLATE: '<ul></ul>',
 
@@ -144,24 +169,6 @@ var TreeView = A.Component.create({
             instance.after('childrenChange', A.bind(instance._afterSetChildren, instance));
 
             instance._delegateDOM();
-        },
-
-        /**
-         * Create Nodes.
-         *
-         * @method createNodes
-         * @param nodes
-         */
-        createNodes: function(nodes) {
-            var instance = this;
-
-            A.Array.each(A.Array(nodes), function(node) {
-                var newNode = instance.createNode(node);
-
-                instance.appendChild(newNode);
-            });
-
-            instance._syncPaginatorUI(nodes);
         },
 
         /**

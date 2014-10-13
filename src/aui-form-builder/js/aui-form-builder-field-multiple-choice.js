@@ -10,6 +10,7 @@ var Lang = A.Lang,
     isArray = Lang.isArray,
 
     AArray = A.Array,
+    AEscape = A.Escape,
 
     getCN = A.getClassName,
 
@@ -245,7 +246,7 @@ var FormBuilderMultipleChoiceField = A.Component.create({
                 options = instance.get('options');
 
             instance.predefinedValueEditor = new A.DropDownCellEditor({
-                options: getEditorOptions(options)
+                options: instance._getPredefinedValuesOptions(options)
             });
         },
 
@@ -295,7 +296,11 @@ var FormBuilderMultipleChoiceField = A.Component.create({
                     editable: true,
                     on: {
                         optionsChange: function(event) {
-                            instance.predefinedValueEditor.set('options', event.newVal);
+                            var values = instance._normalizeValues(event.newVal);
+
+                            values = instance._getPredefinedValuesOptions(values);
+
+                            instance.predefinedValueEditor.set('options', values);
                         }
                     },
                     options: getEditorOptions(options),
@@ -336,12 +341,44 @@ var FormBuilderMultipleChoiceField = A.Component.create({
                         }
                     );
 
-                    return buffer.join(',' + ' ');
+                    return buffer.join(', ');
                 },
                 name: strings.options
             });
 
             return model;
+        },
+
+        /**
+         * Returns a list of predefined values with an empty option
+         *
+         * @method _getPredefinedValuesOptions
+         * @param options
+         * @protected
+         */
+        _getPredefinedValuesOptions: function(options) {
+            var emptyOption = {
+                label: '',
+                value: ''
+            };
+
+            return getEditorOptions([emptyOption].concat(options));
+        },
+
+        /**
+         * Returns an array of objects with values
+         *
+         * @method _normalizeValues
+         * @param values
+         * @protected
+         */
+        _normalizeValues: function(values) {
+            return A.map(values, function(label, value) {
+                return {
+                    label: label,
+                    value: value
+                };
+            });
         },
 
         /**
@@ -362,8 +399,8 @@ var FormBuilderMultipleChoiceField = A.Component.create({
                     buffer.push(
                         Lang.sub(
                             instance.get('optionTemplate'), {
-                                label: A.Escape.html(item.label),
-                                value: A.Escape.html(item.value)
+                                label: AEscape.html(item.label),
+                                value: AEscape.html(item.value)
                             }
                         )
                     );
@@ -397,7 +434,7 @@ var FormBuilderMultipleChoiceField = A.Component.create({
             optionNodes.set('selected', false);
 
             AArray.each(val, function(item) {
-                optionNodes.filter('[value="' + A.Escape.html(item) + '"]').set('selected', true);
+                optionNodes.filter('[value="' + AEscape.html(item) + '"]').set('selected', true);
             });
         }
     }
@@ -406,4 +443,4 @@ var FormBuilderMultipleChoiceField = A.Component.create({
 
 A.FormBuilderMultipleChoiceField = FormBuilderMultipleChoiceField;
 
-A.FormBuilder.types['multiple-choice'] = A.FormBuilderMultipleChoiceField;
+A.FormBuilderField.types['multiple-choice'] = A.FormBuilderMultipleChoiceField;

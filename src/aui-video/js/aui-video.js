@@ -51,62 +51,6 @@ var Video = A.Component.create({
     ATTRS: {
 
         /**
-         * URL used by Video to play.
-         *
-         * @attribute url
-         * @default ''
-         * @type String
-         */
-        url: {
-            value: ''
-        },
-
-        /**
-         * URL (on .ogv format) used by Video to play.
-         *
-         * @attribute ogvUrl
-         * @default ''
-         * @type String
-         */
-        ogvUrl: {
-            value: ''
-        },
-
-        /**
-         * URL (on .swf format) used by Video to create
-         * a fallback player with Flash.
-         *
-         * @attribute swfUrl
-         * @default aui-video/assets/player.swf
-         * @type String
-         */
-        swfUrl: {
-            value: DEFAULT_PLAYER_PATH
-        },
-
-        /**
-         * Image displayed before playback starts.
-         *
-         * @attribute poster
-         * @default ''
-         * @type String
-         */
-        poster: {
-            value: ''
-        },
-
-        /**
-         * An additional list of attributes.
-         *
-         * @attribute fixedAttributes
-         * @default {}
-         * @type Object
-         */
-        fixedAttributes: {
-            value: {}
-        },
-
-        /**
          * The required Flash version for the swf player
          *
          * @attribute flashPlayerVersion
@@ -130,6 +74,39 @@ var Video = A.Component.create({
         },
 
         /**
+         * An additional list of attributes.
+         *
+         * @attribute fixedAttributes
+         * @default {}
+         * @type Object
+         */
+        fixedAttributes: {
+            value: {}
+        },
+
+        /**
+         * URL (on .ogv format) used by Video to play.
+         *
+         * @attribute ogvUrl
+         * @default ''
+         * @type String
+         */
+        ogvUrl: {
+            value: ''
+        },
+
+        /**
+         * Image displayed before playback starts.
+         *
+         * @attribute poster
+         * @default ''
+         * @type String
+         */
+        poster: {
+            value: ''
+        },
+
+        /**
          * If `true` the render phase will be automatically invoked
          * preventing the `.render()` manual call.
          *
@@ -139,6 +116,56 @@ var Video = A.Component.create({
          */
         render: {
             value: true
+        },
+
+        /**
+         * Sets the `aria-role` for Video.
+         *
+         * @attribute role
+         * @default 'application'
+         * @type String
+         */
+        role: {
+            validator: Lang.isString,
+            value: 'application',
+            writeOnce: 'initOnly'
+        },
+
+        /**
+         * URL (on .swf format) used by Video to create
+         * a fallback player with Flash.
+         *
+         * @attribute swfUrl
+         * @default aui-video/assets/player.swf
+         * @type String
+         */
+        swfUrl: {
+            value: DEFAULT_PLAYER_PATH
+        },
+
+        /**
+         * URL used by Video to play.
+         *
+         * @attribute url
+         * @default ''
+         * @type String
+         */
+        url: {
+            value: ''
+        },
+
+        /**
+         * Boolean indicating if use of the WAI-ARIA Roles and States
+         * should be enabled.
+         *
+         * @attribute useARIA
+         * @default true
+         * @type Boolean
+         */
+        useARIA: {
+            validator: Lang.isBoolean,
+            value: true,
+            writeOnce: 'initOnly'
         }
     },
 
@@ -177,6 +204,17 @@ var Video = A.Component.create({
             instance._renderSwfTask = A.debounce(instance._renderSwf, 1, instance);
 
             instance._renderVideo(!instance.get('ogvUrl'));
+
+            instance._video.on('play', function (event) {
+                instance.fire('play', {
+                    cropType: event.type
+                });
+            });
+            instance._video.on('pause', function (event) {
+                instance.fire('pause', {
+                    cropType: event.type
+                });
+            });
         },
 
         /**
@@ -193,6 +231,26 @@ var Video = A.Component.create({
                     fireOnce: true
                 }
             );
+
+            instance.publish('play');
+            instance.publish('pause');
+        },
+
+        /**
+         * Sync the Video UI. Lifecycle.
+         *
+         * @method syncUI
+         * @protected
+         */
+        syncUI: function() {
+            var instance = this;
+
+            if (instance.get('useARIA')) {
+                instance.plug(A.Plugin.Aria, {
+                    roleName: instance.get('role'),
+                    roleNode: instance.get('contentBox')
+                });
+            }
         },
 
         /**
@@ -490,7 +548,7 @@ var Video = A.Component.create({
             var sourceMp4 = instance._sourceMp4;
 
             if (UA.gecko && !instance._usingVideo()) {
-                if (sourceMp4 !== null) {
+                if (sourceMp4) {
                     sourceMp4.remove(true);
 
                     instance._sourceMp4 = null;

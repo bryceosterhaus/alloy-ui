@@ -708,24 +708,6 @@ var TreeNode = A.Component.create({
         },
 
         /**
-         * Create nodes.
-         *
-         * @method createNodes
-         * @param nodes
-         */
-        createNodes: function(nodes) {
-            var instance = this;
-
-            A.Array.each(A.Array(nodes), function(node) {
-                var newNode = instance.createNode(node);
-
-                instance.appendChild(newNode);
-            });
-
-            instance._syncPaginatorUI(nodes);
-        },
-
-        /**
          * Expand the current TreeNode.
          *
          * @method expand
@@ -1162,24 +1144,6 @@ var TreeNodeIO = A.Component.create({
         },
 
         /**
-         * Create nodes.
-         *
-         * @method createNodes
-         * @param nodes
-         */
-        createNodes: function(nodes) {
-            var instance = this;
-
-            A.Array.each(A.Array(nodes), function(node) {
-                var newNode = instance.createNode(node);
-
-                instance.appendChild(newNode);
-            });
-
-            instance._syncPaginatorUI(nodes);
-        },
-
-        /**
          * Expand the current TreeNodeIO.
          *
          * @method expand
@@ -1600,23 +1564,7 @@ var TreeNodeTask = A.Component.create({
                 });
             }
 
-            instance.eachParent(
-                function(parentNode) {
-                    if (isTreeNodeTask(parentNode)) {
-                        var hasUncheckedChild = false;
-
-                        parentNode.eachChildren(function(child) {
-                            if ((child !== instance) && !child.isChecked()) {
-                                hasUncheckedChild = true;
-                            }
-                        });
-
-                        if (!hasUncheckedChild) {
-                            parentNode.get('contentBox').removeClass(CSS_TREE_NODE_CHILD_UNCHECKED);
-                        }
-                    }
-                }
-            );
+            instance._uncheckedAncestorChildRemoveClass();
 
             contentBox.removeClass(CSS_TREE_NODE_CHILD_UNCHECKED);
 
@@ -1645,6 +1593,22 @@ var TreeNodeTask = A.Component.create({
                 });
             }
 
+            instance._uncheckedAncestorChildAddClass();
+
+            contentBox.removeClass(CSS_TREE_NODE_CHILD_UNCHECKED);
+
+            // invoke default uncheck logic
+            A.TreeNodeTask.superclass.uncheck.call(this, originalTarget);
+        },
+
+        /**
+         * Adds the class `tree-node-child-unchecked` to all checked ancestor TreeNodeTasks.
+         *
+         * @method _uncheckedAncestorChildAddClass
+         */
+        _uncheckedAncestorChildAddClass: function() {
+            var instance = this;
+
             instance.eachParent(
                 function(parentNode) {
                     if (isTreeNodeTask(parentNode) && parentNode.isChecked()) {
@@ -1652,11 +1616,43 @@ var TreeNodeTask = A.Component.create({
                     }
                 }
             );
+        },
 
-            contentBox.removeClass(CSS_TREE_NODE_CHILD_UNCHECKED);
+        /**
+         * Removes the class `tree-node-child-unchecked` from ancestor TreeNodeTasks, when all descendant TreeNodeTasks are checked.
+         *
+         * @method _uncheckedAncestorChildRemoveClass
+         */
+        _uncheckedAncestorChildRemoveClass: function() {
+            var instance = this,
+                children,
+                childHasUncheckedChild,
+                parentHasUncheckedDescendants;
 
-            // invoke default uncheck logic
-            A.TreeNodeTask.superclass.uncheck.call(this, originalTarget);
+            instance.eachParent(
+                function(parentNode) {
+                    if (isTreeNodeTask(parentNode) && !parentHasUncheckedDescendants) {
+                        children = parentNode.getChildren();
+
+                        parentHasUncheckedDescendants = A.Array.some(children, function(child) {
+                            if ((child !== instance) && !child.isChecked()) {
+                                return true;
+                            }
+                            else {
+                                childHasUncheckedChild = child.get('contentBox').hasClass(CSS_TREE_NODE_CHILD_UNCHECKED);
+
+                                if (childHasUncheckedChild) {
+                                    return true;
+                                }
+                            }
+                        });
+
+                        if (!parentHasUncheckedDescendants) {
+                            parentNode.get('contentBox').removeClass(CSS_TREE_NODE_CHILD_UNCHECKED);
+                        }
+                    }
+                }
+            );
         }
     }
 });

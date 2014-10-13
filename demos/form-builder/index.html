@@ -32,7 +32,6 @@ YUI({ filter:'raw' }).use('aui-form-builder', function(Y) {
 					label: 'Text',
 					type: 'text',
 					unique: true,
-					width: 100,
 					id: 'uniqueTextField',
 					readOnlyAttributes: ['name']
 				},
@@ -107,7 +106,17 @@ YUI({ filter:'raw' }).use('aui-form-builder', function(Y) {
 							value: 'blue'
 						}
 					]
-				}
+				},
+                {
+                    label: 'Nested fieldset',
+                    type: 'fieldset',
+                    fields: [
+                        {
+                            label: 'Comments',
+                            type: 'textarea'
+                        }
+                    ]
+                }
 			]
 		}
 	).render();

@@ -1,6 +1,6 @@
 # AlloyUI
 
-![AlloyUI Robo Suit](http://f.cl.ly/items/292d3K0l3j221n3m0V0D/Alloy-Robo-Suit.jpg)
+![AlloyUI Robo Suit](https://cloud.githubusercontent.com/assets/398893/3529038/980b55ca-0795-11e4-9ffe-2a41953f1df8.jpg)
 
 AlloyUI is a framework built on top of [YUI3](http://yuilibrary.com) (JavaScript) that uses [Bootstrap 3](http://getbootstrap.com/) (HTML/CSS) to provide a simple API for building high scalable applications.
 
@@ -16,16 +16,22 @@ AlloyUI is a framework built on top of [YUI3](http://yuilibrary.com) (JavaScript
 
 As an user interface framework we do care about browser support. Most of our modules use all the power of HTML5, so for old browsers we provide fallbacks in Flash.
 
-![IE](https://raw.github.com/alrra/browser-logos/master/internet-explorer/internet-explorer_48x48.png) | ![Chrome](https://raw.github.com/alrra/browser-logos/master/chrome/chrome_48x48.png) | ![Firefox](https://raw.github.com/alrra/browser-logos/master/firefox/firefox_48x48.png) | ![Opera](https://raw.github.com/alrra/browser-logos/master/opera/opera_48x48.png) | ![Safari](https://raw.github.com/alrra/browser-logos/master/safari/safari_48x48.png)
+![IE](https://cloud.githubusercontent.com/assets/398893/3528325/20373e76-078e-11e4-8e3a-1cb86cf506f0.png "Internet Explorer") | ![Chrome](https://cloud.githubusercontent.com/assets/398893/3528328/23bc7bc4-078e-11e4-8752-ba2809bf5cce.png "Google Chrome") | ![Firefox](https://cloud.githubusercontent.com/assets/398893/3528329/26283ab0-078e-11e4-84d4-db2cf1009953.png "Mozilla Firefox") | ![Opera](https://cloud.githubusercontent.com/assets/398893/3528330/27ec9fa8-078e-11e4-95cb-709fd11dac16.png "Opera") | ![Safari](https://cloud.githubusercontent.com/assets/398893/3528331/29df8618-078e-11e4-8e3e-ed8ac738693f.png "Safari")
 --- | --- | --- | --- | --- |
 IE 8+ ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ |
 
 ## Automated tasks
 
-Here you can find a set of util tasks to work with [AlloyUI](http://github.com/liferay/alloy-ui) project using [Gulp](http://gulpjs.com/).
+We use [Gulp](http://gulpjs.com/), a task-runner in Node, to automate things.
 
 ```
 gulp <command>
+```
+
+To discover the most commonly used tasks, run:
+
+```
+gulp help
 ```
 
 ### Setup
@@ -44,112 +50,10 @@ gulp <command>
 npm install
     ```
 
-### Init
-
-* Fetch dependencies using [Bower](http://bower.io/) and copy YUI3 files to `build` folder:
-
-    ```
-gulp init
-    ```
-
-### Build
-
-* Build AlloyUI & YUI3 using [Shifter](http://yui.github.io/shifter/):
+4. Build AlloyUI & YUI3 using Shifter:
 
     ```
 gulp build
-    ```
-
-* Build AlloyUI loader:
-
-    ```
-gulp build-loader
-    ```
-
-### Watch
-
-* Watch for any changes and build using [Shifter](http://yui.github.io/shifter/):
-
-    ```
-gulp watch
-    ```
-
-### Create
-
-* Create a new module under `src` folder using [Yogi](http://yui.github.io/yogi/):
-
-    ```
-gulp create
-    ```
-
-### Format
-
-* Format CSS & JavaScript code:
-
-    ```
-gulp format
-    ```
-
-* Format only CSS code using [CSS Beautify](https://www.npmjs.org/package/cssbeautify/):
-
-    ```
-gulp format-css
-    ```
-
-* Format only JavaScript code using [JS Beautify](https://www.npmjs.org/package/js-beautify/):
-
-    ```
-gulp format-js
-    ```
-
-### Lint
-
-* Lint JavaScript code using [JSHint](http://www.jshint.com/):
-
-    ```
-gulp lint
-    ```
-
-### Release
-
-* Build modules and generate a release zip file:
-
-    ```
-gulp release
-    ```
-
-* Build modules optimized for CDN and generate a release zip file:
-
-    ```
-gulp release-cdn
-    ```
-
-### Test
-
-* Run unit tests using [PhantomJS](http://phantomjs.org/):
-
-    ```
-gulp test
-    ```
-
-* Run tests in the browser using [Yeti](http://yeti.cx/):
-
-    ```
-gulp test-browser
-    ```
-
-### API Docs
-
-* Import code examples from alloyui.com and build docs locally using [YUIDoc](http://yui.github.io/yuidoc/):
-
-    ```
-gulp api
-    ```
-
-* Watch for any changes and build docs locally using [YUIDoc](http://yui.github.io/yuidoc/):
-
-    ```
-gulp api-watch
     ```
 
 ## Discussion

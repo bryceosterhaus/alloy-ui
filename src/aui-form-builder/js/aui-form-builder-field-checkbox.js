@@ -8,11 +8,14 @@
 var L = A.Lang,
 
     AArray = A.Array,
+    AEscape = A.Escape,
 
     getCN = A.getClassName,
 
+    CSS_CHECKBOX = getCN('checkbox'),
     CSS_FIELD = getCN('field'),
     CSS_FIELD_CHECKBOX = getCN('field', 'checkbox'),
+    CSS_FIELD_CHECKBOX_TEXT = getCN('field', 'checkbox', 'text'),
     CSS_FIELD_CHOICE = getCN('field', 'choice'),
     CSS_FORM_BUILDER_FIELD = getCN('form-builder-field'),
     CSS_FORM_BUILDER_FIELD_NODE = getCN('form-builder-field', 'node'),
@@ -30,15 +33,6 @@ var L = A.Lang,
  * @constructor
  */
 var FormBuilderCheckBoxField = A.Component.create({
-
-    /**
-     * Static property provides a string to identify the class.
-     *
-     * @property NAME
-     * @type String
-     * @static
-     */
-    NAME: 'form-builder-checkbox-field',
 
     /**
      * Static property used to define the default attribute
@@ -104,6 +98,15 @@ var FormBuilderCheckBoxField = A.Component.create({
      */
     EXTENDS: A.FormBuilderField,
 
+    /**
+     * Static property provides a string to identify the class.
+     *
+     * @property NAME
+     * @type String
+     * @static
+     */
+    NAME: 'form-builder-checkbox-field',
+
     prototype: {
 
         /**
@@ -115,12 +118,11 @@ var FormBuilderCheckBoxField = A.Component.create({
          */
         renderUI: function() {
             var instance = this,
-                templateNode = instance.get('templateNode'),
-                labelNode = instance.get('labelNode');
+                contentBox = instance.get('contentBox');
 
             A.FormBuilderCheckBoxField.superclass.renderUI.apply(instance, arguments);
 
-            labelNode.insert(templateNode, labelNode, 'before');
+            contentBox.addClass(CSS_CHECKBOX);
         },
 
         /**
@@ -141,8 +143,8 @@ var FormBuilderCheckBoxField = A.Component.create({
                         attributeName: 'predefinedValue',
                         editor: new A.RadioCellEditor({
                             options: {
-                                'true': strings.yes,
-                                'false': strings.no
+                                'false': strings.no,
+                                'true': strings.yes
                             }
                         }),
                         formatter: A.bind(instance._booleanFormatter, instance),
@@ -167,12 +169,32 @@ var FormBuilderCheckBoxField = A.Component.create({
             return L.sub(
                 instance.get('template'), {
                     checked: checked ? 'checked="checked"' : '',
-                    id: A.Escape.html(instance.get('id')),
-                    label: A.Escape.html(instance.get('label')),
-                    name: A.Escape.html(instance.get('name')),
-                    value: A.Escape.html(instance.get('predefinedValue'))
+                    id: AEscape.html(instance.get('id')),
+                    label: AEscape.html(instance.get('label')),
+                    name: AEscape.html(instance.get('name')),
+                    value: AEscape.html(instance.get('predefinedValue'))
                 }
             );
+        },
+
+        /**
+         * Set the `label` attribute on the UI.
+         *
+         * @method _uiSetLabel
+         * @param val
+         * @protected
+         */
+        _uiSetLabel: function(val) {
+            var instance = this,
+                labelNode = instance.get('labelNode'),
+                showLabel = instance.get('showLabel'),
+                templateNode = instance.get('templateNode');
+
+            labelNode.setContent('<span class="' + CSS_FIELD_CHECKBOX_TEXT + '">' + AEscape.html(val) + '</span>');
+
+            instance._uiSetShowLabel(showLabel);
+
+            labelNode.prepend(templateNode);
         },
 
         /**
@@ -192,12 +214,28 @@ var FormBuilderCheckBoxField = A.Component.create({
             else {
                 templateNode.removeAttribute('checked');
             }
-        }
+        },
 
+        /**
+         * Set the `showLabel` attribute on the UI.
+         *
+         * @method _uiSetShowLabel
+         * @param val
+         * @protected
+         */
+        _uiSetShowLabel: function(val) {
+            var instance = this,
+                labelNode = instance.get('labelNode'),
+                labelTextNode = labelNode.one('.' + CSS_FIELD_CHECKBOX_TEXT);
+
+            if (labelTextNode) {
+                labelTextNode.toggle(val);
+            }
+        }
     }
 
 });
 
 A.FormBuilderCheckBoxField = FormBuilderCheckBoxField;
 
-A.FormBuilder.types.checkbox = A.FormBuilderCheckBoxField;
+A.FormBuilderField.types.checkbox = A.FormBuilderCheckBoxField;
